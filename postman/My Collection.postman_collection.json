@@ -1,0 +1,359 @@
+{
+  "info": {
+    "_postman_id": "27dd2f94-6b40-4bfb-9946-8680801768eb",
+    "name": "My Collection",
+    "description": "### Welcome to Postman! This is your first collection. \n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests\n• Test your API in real-world scenarios\n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "60273524",
+    "_collection_link": "https://go.postman.co/collection/60273524-27dd2f94-6b40-4bfb-9946-8680801768eb?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Get All Products",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Four products are available\", function () {\n    const data = pm.response.json();\n    pm.expect(Object.keys(data).length).to.equal(4);\n});\n\npm.test(\"Laptop details are correct\", function () {\n    const data = pm.response.json();\n\n    pm.expect(data[\"1\"].name).to.equal(\"Laptop\");\n    pm.expect(data[\"1\"].price).to.equal(50000);\n    pm.expect(data[\"1\"].stock).to.equal(10);\n});\n\npm.test(\"Mouse details are correct\", function () {\n    const data = pm.response.json();\n\n    pm.expect(data[\"2\"].name).to.equal(\"Mouse\");\n    pm.expect(data[\"2\"].price).to.equal(500);\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:5000/products",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5000",
+          "path": [
+            "products"
+          ]
+        },
+        "description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+      },
+      "response": []
+    },
+    {
+      "name": "Add Product to Cart",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 201\", function () {\n    pm.response.to.have.status(201);\n});\n\npm.test(\"Product added successfully\", function () {\n    const data = pm.response.json();\n    pm.expect(data.message).to.equal(\"Product added successfully\");\n});\n\npm.test(\"Cart contains the added product\", function () {\n    const data = pm.response.json();\n    pm.expect(data.cart).to.be.an(\"array\");\n    pm.expect(data.cart.length).to.be.greaterThan(0);\n});\n\npm.test(\"Correct product is added\", function () {\n    const data = pm.response.json();\n    pm.expect(data.cart[0].name).to.equal(\"Laptop\");\n    pm.expect(data.cart[0].product_id).to.equal(1);\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"product_id\": 1,\n    \"quantity\": 2\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:5000/cart/add",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5000",
+          "path": [
+            "cart",
+            "add"
+          ]
+        },
+        "description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+      },
+      "response": []
+    },
+    {
+      "name": "View Shopping Cart",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Cart is returned\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.cart).to.be.an(\"array\");\r\n});\r\n\r\npm.test(\"Cart contains Laptop\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.cart[0].name).to.equal(\"Laptop\");\r\n});\r\n\r\npm.test(\"Subtotal is correct\", function () {\r\n    const data = pm.response.json();\r\n\r\n    const calculatedSubtotal = data.cart.reduce(\r\n        (sum, item) => sum + item.price * item.quantity, 0\r\n    );\r\n\r\n    pm.expect(data.subtotal).to.equal(calculatedSubtotal);\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:5000/cart",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5000",
+          "path": [
+            "cart"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Test Invalid Product ID",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"product_id\": 999,\r\n    \"quantity\": 1\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:5000/cart/add",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5000",
+          "path": [
+            "cart",
+            "add"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Test Negative Quantity",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 400\", function () {\r\n    pm.response.to.have.status(400);\r\n});\r\n\r\npm.test(\"Negative quantity is rejected\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.error).to.equal(\r\n        \"Quantity must be a positive integer\"\r\n    );\r\n});\r\n\r\npm.test(\"Error response is returned\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data).to.have.property(\"error\");\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"product_id\": 1,\r\n    \"quantity\": -5\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:5000/cart/add",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5000",
+          "path": [
+            "cart",
+            "add"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Test Zero Quantity",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 400\", function () {\r\n    pm.response.to.have.status(400);\r\n});\r\n\r\npm.test(\"Zero quantity is rejected\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.error).to.equal(\r\n        \"Quantity must be a positive integer\"\r\n    );\r\n});\r\n\r\npm.test(\"Error response is returned\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data).to.have.property(\"error\");\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"product_id\": 1,\r\n    \"quantity\": 0\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:5000/cart/add",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5000",
+          "path": [
+            "cart",
+            "add"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Test Insufficient Stock",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 400\", function () {\r\n    pm.response.to.have.status(400);\r\n});\r\n\r\npm.test(\"Insufficient stock is rejected\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.error).to.equal(\"Insufficient stock\");\r\n});\r\n\r\npm.test(\"Error response is returned\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data).to.have.property(\"error\");\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"product_id\": 1,\r\n    \"quantity\": 20\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:5000/cart/add",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5000",
+          "path": [
+            "cart",
+            "add"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Checkout and Generate Bill",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Order placed successfully\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.message).to.equal(\"Order placed successfully\");\r\n});\r\n\r\npm.test(\"Discount calculation is correct\", function () {\r\n    const bill = pm.response.json().bill;\r\n    const expectedDiscount = bill.subtotal >= 1000\r\n        ? bill.subtotal * 0.10 : 0;\r\n\r\n    pm.expect(bill.discount).to.equal(expectedDiscount);\r\n});\r\n\r\npm.test(\"GST calculation is correct\", function () {\r\n    const bill = pm.response.json().bill;\r\n    const taxableAmount = bill.subtotal - bill.discount;\r\n\r\n    pm.expect(bill.gst).to.equal(\r\n        Number((taxableAmount * 0.05).toFixed(2))\r\n    );\r\n});\r\n\r\npm.test(\"Final amount is correct\", function () {\r\n    const bill = pm.response.json().bill;\r\n    const expected = bill.subtotal - bill.discount + bill.gst;\r\n\r\n    pm.expect(bill.final_amount).to.equal(\r\n        Number(expected.toFixed(2))\r\n    );\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:5000/checkout",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5000",
+          "path": [
+            "checkout"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Verify Empty Cart",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Cart is empty after checkout\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.cart).to.be.an(\"array\").that.is.empty;\r\n});\r\n\r\npm.test(\"Subtotal is zero\", function () {\r\n    const data = pm.response.json();\r\n    pm.expect(data.subtotal).to.equal(0);\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:5000/cart",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5000",
+          "path": [
+            "cart"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
